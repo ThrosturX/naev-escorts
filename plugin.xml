@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin name="Sea of Escorts">
+    <author>ThrosturX</author>
+    <version>0.11</version>
+    <compatibility>0\.(10|11)\..*</compatibility>
+    <priority>1</priority>
+    <description>Adds hireable escorts to the game.</description>
+</plugin>

@@ -489,7 +489,7 @@ local function pick_favorite_ship(me)
     local choices = {}
 
     -- lazy method favors first-seen ships
-    for ship, score in pairs(me.favorite_ships) do
+    for _, score in pairs(me.favorite_ships) do
         if score >= max_score then
             max_score = score
         end
@@ -822,6 +822,7 @@ local function _createReplacementShip(persona, limit_ships)
                 table.insert(ship_choices, {ship = "Pirate Kestrel", royalty = 0.74})
                 table.insert(ship_choices, {ship = "Pirate Kestrel", royalty = 0.75})
                 table.insert(ship_choices, {ship = "Pirate Kestrel", royalty = 0.79})
+                table.insert(ship_choices, {ship = "Pirate Zebra", royalty = 0.66})
             else
                 table.insert(ship_choices, {ship = "Kestrel", royalty = 0.71})
                 table.insert(ship_choices, {ship = "Kestrel", royalty = 0.72})
@@ -1074,6 +1075,7 @@ local function create_pilot(fac)
             {ship = "Pirate Phalanx", royalty = 0.35}
         }
         dream_choices = {
+            "Pirate Zebra",
             "Pirate Starbridge",
             "Pirate Rhino",
             "Pirate Admonisher",
@@ -1189,9 +1191,9 @@ local function create_pilot(fac)
     newpilot.alive = true
     newpilot.spawning = false
     newpilot.portrait = portrait.get(portrait_arg)
-   newpilot.portrait_offduty = newpilot.portrait
-   newpilot.portrait_onduty = pilot_portrait()
-   newpilot.vncharacter = portrait.getFullPath(newpilot.portrait)
+    newpilot.portrait_offduty = newpilot.portrait
+    newpilot.portrait_onduty = pilot_portrait()
+    newpilot.vncharacter = portrait.getFullPath(newpilot.portrait)
     newpilot.chatter = math.min(0.96, math.max(0.04, 0.5 + 0.3 * rnd.threesigma())) -- add some personality flavour
     newpilot.dreamship = dream_choices[rnd.rnd(1, #dream_choices)]
     for _j, shipname in ipairs(big_dreams) do
@@ -1353,7 +1355,6 @@ function approachScavenger(npc_id)
    vn.clear()
    vn.scene()
 
-
    local stranger_choices = {
       "neutral/bartender_m1.webp",
       "neutral/bartender_f1.webp",
@@ -1364,8 +1365,13 @@ function approachScavenger(npc_id)
    }
    vn.transition()
 
+   print("PROBE 4")
+   print(pdata.name, pdata.vncharacter)
+
    local escort = vn.newCharacter ( pdata.name, {image=pdata.vncharacter } )
+   print("PROBE 5")
    vn.transition()
+   print("PROBE 6")
    escort(
             fmt.f(
                 _(
@@ -1449,7 +1455,7 @@ Most importantly, they need considerable micromanagement and you'd be wise to hi
       stranger(_([[You are unlikely to be able to command the necessary level of respect needed to control these pilots, especially with pilots with whom you have no prior relationship.
 Another thing to consider is that they each have their own personality, some of them will talk a lot, and I mean really a lot, while others are relatively quiet.]]))
       stranger(_([[These vagabonds are trained combat personnel, but they aren't working. Do I need to tell you why? Well, the important thing is that they will attempt to eject from their ship to avoid death and may even run away from an active combat situation in some cases.
-The good news is, you don't need to hire new pilots if you keep geting into scuffles.]]))
+The good news is, you don't need to hire new pilots if you keep getting into scuffles.]]))
       stranger(_([[As your escort crew and your escort commander successfully board enemy ships and sell plundered commodities, they will earn credits and gain experience.
 Experienced escorts generally perform better at their duties, but most importantly they are more likely to buy an appropriate ship on their own as their budget increases with experience.]]))
       stranger(_([[You can help your escorts finance new ships at any shipyard, otherwise they will purchase what they consider a suitable replacement when necessary.
@@ -1531,9 +1537,9 @@ As you conduct your affairs on the spaceport, you notice your new {sidekick} in 
                _("with bunny ears attached to the top of the cockpit"),
                -- TODO for these: use the nice generators from companions
                fmt.f(_("but it kind of looks like a {thing}"), { thing = _("cargo container") }),
-               fmt.f(_("with the letters {thing} written in crimson red on the hull"), { thing = _("Darker") }),
-               fmt.f(_("with {thing} written in safety orange on the hull"), { thing = _("cargo container") }),
-               fmt.f(_("with {thing} master written in bright yellow on the hull above a rather sizeable decal of a {thing}"), { thing = _("banana") }),
+               fmt.f(_("with the letters '{thing}' written in crimson red on the hull"), { thing = _("Darker") }),
+               fmt.f(_("with '{thing}' written in safety orange on the hull"), { thing = _("cargo container") }),
+               fmt.f(_("with '{thing} master' written in bright yellow on the hull above a rather sizeable decal of a {thing}"), { thing = _("banana") }),
                _("that has seen its fair share of violence over the years"),
                _("doesn't look like it has very long left, but you can only hope for the best"),
                _("has seen better days"),

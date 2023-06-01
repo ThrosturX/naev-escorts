@@ -11,8 +11,6 @@ mem.send_escort = true
 mem.autoleader =  false
 
 function create ()
-   create_pre()
-
    local p = ai.pilot()
    local ps = p:ship()
 
@@ -20,9 +18,6 @@ function create ()
    mem.guarddodist   = 1000 + 200 * ps:size()
    mem.guardreturndist = mem.guarddodist + 2000
    mem.enemyclose    = mem.guarddodist
-
-   -- Finish up creation
-   create_post()
 end
 
 -- is it close to me or my protectee?
@@ -43,16 +38,15 @@ end
 
 -- luacheck: globals idle (AI Task functions passed by name)
 function idle ()
-
    local pp = player.pilot()
    local me = ai.pilot()
    local subordinates = me:followers()
 
-   local hostiles = pp:getHostiles(mem.guarddodist, me:pos(), true, false, false)
+   local hostiles = pp:getEnemies(mem.guarddodist, me:pos(), true, false, false)
    local detected_hostile = nil
    local can_send = rnd.rnd(1, #subordinates * 2) == #subordinates
 
-   for i, enemy in ipairs(hostiles) do
+   for _, enemy in ipairs(hostiles) do
       if should_attack(enemy) then
          local dangerous = false
          if enemy:ship():size() >= 3 then
@@ -60,9 +54,8 @@ function idle ()
          end
 
          if dangerous then
-            for j, under in ipairs(subordinates) do
+            for _, under in ipairs(subordinates) do
                me:msg(under, "e_attack", enemy)
---               under:pushtask( "attack", enemy )
             end
             ai.pushtask( "attack", enemy )
             return
@@ -80,7 +73,7 @@ function idle ()
    local guarddist = ai.dist(pp:pos())
    if guarddist > mem.guardreturndist then
          ai.iface(pp)
-      ai.accel(1)
+         ai.accel(1)
       return
    end
 
@@ -93,21 +86,27 @@ function idle ()
             return
          elseif (should_attack(target) or (mem.aggressive and not ai.canboard(target))) and rnd.rnd(0, 1) == 0 then
             -- a pot shot or two
+            ai.hostile(target)
             ai.settarget( target )
             ai.aim(target)
             ai.shoot()
+            if not detected_hostile or ai.dist2(detected_hostile) > ai.dist2(target) then
+                detected_hostile = target
+            end
          end
       end
    end
 
-      -- find nearby enemy
+   -- find nearby enemy
    local enemy = detected_hostile
    if not enemy then
       enemy = ai.getenemy()
    end
    if enemy ~= nil then
-      for k, v in ipairs(me:followers()) do
-         me:msg ( v, "e_attack", enemy )
+      ai.hostile(enemy)
+      ai.weapset( 5 )
+      for _, under in ipairs(me:followers()) do
+         me:msg(under, "e_attack", enemy)
       end
       ai.pushtask("attack", enemy)
    end
